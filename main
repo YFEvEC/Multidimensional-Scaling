@@ -1,0 +1,296 @@
+\documentclass[12pt]{article}
+ 
+\usepackage[margin=0.75in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{physics}
+\usepackage{mathdots}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{tikz}
+\usepackage[T1]{fontenc}
+\usepackage[numbered,framed]{matlab-prettifier}
+\usepackage{MnSymbol,wasysym}
+\usepackage{hyperref}
+\usepackage{filecontents}
+\def\firstcircle{(90:4cm) circle (4.5cm)}
+\def\secondcircle{(200:3cm) circle (4.5cm)}
+\def\thirdcircle{(340:3cm) circle (4.5cm)}
+
+\newcommand{\N}{\mathbb{N}}
+% Bold for vectors and matrices
+\newcommand\vect[1]{\mathbf{#1}}
+\newcommand{\Z}{\mathbb{Z}}
+\renewcommand{\theenumi}{\alph{enumi}}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+ 
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][\large Exercise]{\begin{trivlist}
+\item[\centering \Large \hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{reflection}[2][Reflection]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+ 
+\makeatletter
+\def\@seccntformat#1{%
+  \expandafter\ifx\csname c@#1\endcsname\c@section\else
+  \csname the#1\endcsname\quad
+  \fi}
+\makeatother
+
+\setcounter{MaxMatrixCols}{20} 
+
+
+
+\usepackage{xcolor}
+\colorlet{kw}{blue}
+\definecolor{com}{rgb}{0,0.6,0.3}
+
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
+% redefine keywords
+\algrenewcommand\algorithmicfunction{\textcolor{kw}{function}}
+\algrenewcommand\algorithmicwhile{\textcolor{kw}{while}}
+\algrenewcommand\algorithmicfor{\textcolor{kw}{for}}
+\algrenewcommand\algorithmicif{\textcolor{kw}{if}}
+\algrenewcommand\algorithmicelse{\textcolor{kw}{else}}
+\algrenewcommand\algorithmicend{\textcolor{kw}{end}}
+
+% new keywords
+\algnewcommand\Break{\textcolor{kw}{break}}%
+\algnewcommand\Continue{\textcolor{kw}{continue}}%
+
+% redefine loops
+\algdef{SE}[WHILE]{While}{EndWhile}[1]{\algorithmicwhile\ #1}{\algorithmicend}%
+\algdef{SE}[FOR]{For}{EndFor}[1]{\algorithmicfor\ #1}{\algorithmicend}%
+\algdef{SE}[IF]{IF}{EndFor}[1]{\algorithmicif\ #1 }{\algorithmicend}%
+
+% redefine comments
+\algrenewcommand{\algorithmiccomment}[1]{{\color{com}\%#1}}
+
+
+\begin{document}
+
+ 
+\title{\textbf{Multidimensional Scaling.}}%replace X with the appropriate number
+\author{Eve Chen} %if necessary, replace with your course title
+\date{\normalsize 24th May}
+\maketitle
+\noindent \underline{\textbf{Introduction}} \\
+
+In this project, my objective is to apply multidimensional scaling (MDS) in order to generate low-dimensional representations, specifically 1, 2, and 3-dimensional models, of a selected group of objects. My goal is to preserve as much as possible the original inter-object distance relations. For this task, I've opted for data set number 29, which centers on mutation distances.\\
+
+The data set I've picked for this project is number 29, which focuses on mutation distances between various species. This set encompasses 20 distinct species, detailing their mutation distances in relation to other species. For simplicity's sake, in the first row, the species' names will be shortened to their first two letters, with the exception of dog, pig, rabbit (which will be shortened to 'Rab'), and moth (which will be shortened to 'mot').\\
+\begin{table}[h!]
+\centering
+\setlength{\tabcolsep}{3pt} 
+\begin{tabular}{l|cccccccccccccccccccc}
+Species & Ma & Mo & Dog & Ho & Do & Pig & Rab & Ka & Pe & Pi & Ch & Ki & Sn & Ra & Tu & Sc & Mot & Ba & Br & Sk \\
+\hline
+Ma & 0 & 1 & 13 & 17 & 16 & 13 & 12 & 12 & 17 & 16 & 18 & 18 & 19 & 20 & 31 & 33 & 36 & 63 & 56 & 66 \\
+Mo & 1 & 0 & 12 & 16 & 15 & 12 & 11 & 13 & 16 & 15 & 17 & 17 & 18 & 21 & 32 & 32 & 25 & 62 & 57 & 65 \\
+Dog & 13 & 12 & 0 & 10 & 8 & 4 & 6 & 7 & 12 & 12 & 14 & 14 & 13 & 30 & 29 & 24 & 28 & 64 & 61 & 66 \\
+Ho & 17 & 16 & 10 & 0 & 1 & 5 & 11 & 11 & 16 & 16 & 16 & 17 & 16 & 32 & 27 & 24 & 33 & 64 & 60 & 68 \\
+Do & 16 & 15 & 8 & 1 & 0 & 4 & 10 & 12 & 15 & 15 & 15 & 16 & 15 & 31 & 26 & 25 & 32 & 64 & 59 & 67 \\
+Pig & 13 & 12 & 4 & 5 & 4 & 0 & 6 & 7 & 13 & 13 & 13 & 14 & 13 & 30 & 25 & 26 & 31 & 64 & 59 & 67 \\
+Rab & 12 & 11 & 6 & 11 & 10 & 6 & 0 & 7 & 10 & 8 & 11 & 11 & 11 & 25 & 26 & 23 & 29 & 62 & 59 & 67 \\
+Ka & 12 & 13 & 7 & 11 & 12 & 7 & 7 & 0 & 14 & 14 & 15 & 13 & 14 & 30 & 27 & 26 & 31 & 66 & 58 & 68 \\
+Pe & 17 & 16 & 12 & 16 & 15 & 13 & 10 & 14 & 0 & 3 & 3 & 3 & 7 & 24 & 27 & 26 & 30 & 59 & 62 & 66 \\
+Pi & 16 & 15 & 12 & 16 & 15 & 13 & 8 & 14 & 3 & 0 & 4 & 4 & 8 & 24 & 27 & 26 & 30 & 59 & 62 & 66 \\
+Ch & 18 & 17 & 14 & 16 & 15 & 13 & 11 & 15 & 3 & 4 & 0 & 2 & 8 & 28 & 26 & 26 & 31 & 61 & 62 & 66 \\
+Ki & 18 & 17 & 14 & 17 & 16 & 14 & 11 & 13 & 3 & 4 & 2 & 0 & 8 & 28 & 27 & 28 & 30 & 62 & 61 & 65 \\
+Sn & 19 & 18 & 13 & 16 & 15 & 13 & 11 & 14 & 7 & 8 & 8 & 8 & 0 & 30 & 27 & 30 & 33 & 65 & 64 & 67 \\
+Ra & 20 & 21 & 30 & 32 & 31 & 30 & 25 & 30 & 24 & 24 & 28 & 28 & 30 & 0 & 38 & 40 & 41 & 72 & 66 & 69 \\
+Tu & 31 & 32 & 29 & 27 & 26 & 25 & 26 & 27 & 27 & 27 & 26 & 27 & 27 & 38 & 0 & 34 & 41 & 72 & 66 & 69 \\
+Sc & 33 & 32 & 24 & 24 & 25 & 26 & 23 & 26 & 26 & 26 & 26 & 28 & 30 & 40 & 34 & 0 & 16 & 58 & 63 & 65 \\
+Mot & 36 & 35 & 28 & 33 & 32 & 31 & 29 & 31 & 30 & 30 & 31 & 30 & 33 & 41 & 41 & 16 & 0 & 59 & 60 & 61 \\
+Ba & 63 & 62 & 64 & 64 & 64 & 64 & 62 & 66 & 59 & 59 & 61 & 62 & 65 & 61 & 72 & 58 & 59 & 0 & 57 & 61 \\
+Br & 56 & 57 & 61 & 60 & 59 & 59 & 59 & 58 & 62 & 62 & 62 & 61 & 64 & 61 & 66 & 63 & 60 & 57 & 0 & 41 \\
+Sk & 66 & 65 & 66 & 68 & 67 & 67 & 67 & 68 & 66 & 66 & 66 & 65 & 67 & 69 & 69 & 65 & 61 & 61 & 41 & 0 \\
+\end{tabular}
+\caption{Mutation Distances (Transposed)}
+\label{table:1}
+\end{table}
+The previous table is a matrix that represents the mutation distances between various species when $D_{ij}$ means the mutation distance between species $i$ and $j$.\\
+
+To begin with, let's examine the 1-D model of the mutation distance data set. Utilizing the cmdscale function, I generate a graph that represents the 1-D model output. The graph is displayed below, with unique coordinates for every species from our initial dataset:\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=150mm,scale=0.5]{graph1.png}
+\caption{1-D model output}
+\label{fig:chart}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=150mm,scale=0.5]{graph2.png}
+\caption{eigenvalue plot for the 20 species model}
+\label{fig:chart}
+\end{figure}\\
+
+The output from the 1-D model illustrates that most points are clustered between -10 and 2, with the exception of three outlier points situated between 40 to 50 (I'll discuss these extreme values at a later point). Analyzing the eigenvalue plot from the 1-D model reveals that only the initial 14 are non-zero. This suggests the data would best fit into a 14-dimensional space, although the presence of negative eigenvalues indicates the distances are non-euclidean, meaning no Euclidean model will provide a flawless fit. Furthermore, it's notable that the first eigenvalue is significantly larger than the others, which themselves are relatively similar in size.\\
+The GOF value:
+$$[0.526570552556809 {\ } 0.535637996222673]$$\\
+
+The quality of the model fit is represented by a value ranging from 0 to 1, where 1 signifies a perfect fit, and 0 represents an entirely inadequate fit. Please note that R provides two distinct Goodness-of-Fit (GOF) values as it employs two methods to calculate them. If all eigenvalues were positive, these two GOF values would match; however, in this case, they differ due to the presence of negative eigenvalues. The GOF derived from this 1-D model is approximately 0.53, which suggests that the fit is far from optimal. \\
+
+Next, my intention is to compute the distance matrix for this 1-D model and juxtapose it with the original distance matrix. Various comparison techniques will be used for this purpose, such as the mean absolute difference of the entries, the mean squared difference of the entries, the maximum absolute difference, and so forth:\\
+$$\textit{The mean absolute difference (MAD)} = 13.7920769798488 $$
+$$\textit{The mean squared difference (MSD)} = 267.905239315182 $$
+$$\textit{The maximum absolute difference (MAXAD)} = 52.4448015084595$$
+Comparing the four different values, we find that the most significant deviation from the accurate distance is roughly 52.4448, and the average deviation is approximately 13.7921. To determine whether these discrepancies are substantial, we could normalize them against the values in the original matrix (the maximum percentage of error will be provided below for simplicity): 
+$$\textit{The Maximum Percentage of Error (MPE)} = 99.34\%$$
+Here's a graph comparing the model-generated distances with the original distances:\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=150mm,scale=0.5]{graph3.png}
+\caption{ distances of the 1-D model against the original distances}
+\label{fig:chart}
+\end{figure}\\
+I positioned the original distances along the x-axis and the model distances along the y-axis, ensuring they share the same scale. The ideal situation would be if all points were situated along the y = x line. However, it is clear that the plot doesn't exhibit this pattern and the points have strayed significantly from the y = x line. This further substantiates the assertion that the model is underperforming.\\
+
+To compare all outputs plots for different models, I made six different graphs for  1-D and 2-D models of 20 species, 2-D models of 17 species(which exclude the three outliers), and 2-D models of 13 species(The reason or choosing 13 will be explained later). Since the plot for 3-D is hard to visualize, I did not make the table here. The following are the plots for 1-D and 2-D (20 species):\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=110mm,scale=0.5]{1D-20.png}
+\caption{plot for the 1-D model with 20 species}
+\label{fig:chart}
+\end{figure}\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=110mm,scale=0.5]{2D-20.png}
+\caption{plot for the 2-D model with 20 species}
+\label{fig:chart}
+\end{figure}\\
+Looking at the 2-D visualizations above, it's evident that most data points are congregated in the top left quadrant, with the notable exceptions of Baker’s mold, Bread Yeast, and Skin fungi. These three species have considerably larger x-values, mirroring the separation seen in the 1-D plot. Their uniqueness underscores some intriguing aspects that require further investigation.\\
+
+Anticipating the 3-D visualization, it's safe to assume a similar clustering pattern will emerge, with the previously noted three species standing apart. The conspicuous differentiation of these species is a recurrent theme in our 1-D and 2-D plots.\\
+
+Now, let's delve into these distinct species. It's worth mentioning that all species except the last three are animals, while Baker’s mold, Bread Yeast, and Skin Fungus belong to the fungi kingdom. The significant variation in mutation distances among these species might be due to this stark difference in biological classification. Fungi exhibit distinct life processes compared to animals, potentially resulting in these large mutation distances.\\
+
+With this in mind, I propose we exclude Baker’s mold, Bread Yeast, and Skin Fungus from our dataset and rerun the 2-D model using only the remaining 17 animal species. This could provide us with a clearer understanding of whether the model would yield a better fit without these extreme outliers:\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=150mm,scale=0.5]{2D-17.png}
+\caption{plot for the 2-D model with 17 species}
+\label{fig:chart}
+\end{figure}\\
+
+In contrast to the previous 2-D model that included Baker’s mold, Bread Yeast, and Skin Fungus, the ranges of the x-dimension and y-dimension significantly contract when we focus only on the remaining species. However, a few points—specifically those representing the moth, screwworm fly, rattlesnake, and tuna—still appear to deviate substantially from the central cluster.\\
+
+Interestingly, this model reveals further species that display noticeable variation from the rest. Despite all being animals, the diverse classifications within this kingdom can still result in considerable mutation distances. Consequently, I propose we segregate the remaining 17 animal species into distinct categories, such as mammals, birds, cold-blooded animals, and insects.\\ 
+
+On closer examination, humans and monkeys, both primates, share proximity, suggesting relatively minor mutation distances within mammalian species. Birds also seem to exhibit mutation distances within a similar range when compared to mammals. However, cold-blooded animals and insects, although part of the same animal kingdom, present significantly larger mutation distances from mammals and birds. The snapping turtle serves as an anomaly here—it's a cold-blooded creature that nonetheless exhibits mutation distances closer to mammals and birds. Without specific biological expertise, we can only speculate about potential causes for this, such as dietary habits or anatomical structures. For simplicity, we'll group the snapping turtle with mammals and birds.\\
+
+Then I propose we exclude the four distinct outliers (moth, screwworm fly, rattlesnake, and tuna) and proceed with only the remaining 13 species. Running the 2-D model with this refined dataset might allow us to ascertain if we can achieve a better fit without these extreme data points:\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=150mm,scale=0.5]{2D-13.png}
+\caption{plot for the 2-D model with 13 species}
+\label{fig:chart}
+\end{figure}\\
+
+As we further narrow down the scope of our x and y dimensions, an interesting pattern emerges. It appears that the species are divided into three distinct clusters, each resembling a specific animal category: primates, other mammals, and birds. This pattern seems to align with the broader classifications of animals. The correlation gives us intriguing insights into what the dimensions of the model might signify, which I'll delve into shortly after presenting a comparison of our various models. This evidence provides a persuasive case that our method of categorizing and filtering species for our model could indeed reveal meaningful information about the genetic mutation distances among different animal groups.\\
+
+Then I would like to compare the eigenvalue plots for the different numbers- 13, 17, and 20- of species:\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=80mm,scale=0.5]{eig-13.png}
+\caption{eigenvalue plot for 13 species}
+\label{fig:chart}
+\end{figure}\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=80mm,scale=0.5]{eig-17.png}
+\caption{eigenvalue plot for 17 species}
+\label{fig:chart}
+\end{figure}\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=80mm,scale=0.5]{eig-20.png}
+\caption{eigenvalue plot for 20 species}
+\label{fig:chart}
+\end{figure}\\
+With the model comprising 20 species, we observe 14 positive eigenvalues, implying that the best data fit would be achieved with a 14-D model. Similarly, the models for 17 and 13 species display 12 and 9 positive eigenvalues, respectively, suggesting that the optimal dimensional models for these data sets would be 12-D and 9-D.\\
+
+As we exclude more species from our data set, we notice a downward trend in the overall eigenvalues. However, a handful of considerably larger eigenvalues persist in each case. For instance, the top four values in the 17-species model and the first two in the 13-species model are significantly larger.\\
+Then I would like to make distance matrix comparison plots for different models: 1-D(20 species), 2-D(20 species), 3-D (20 species), 2-D (17 species), 2-D(13 species), and 3-D (13 species):\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=80mm,scale=0.5]{graph3.png}
+\caption{1-D(20 species)}
+\label{fig:chart}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=80mm,scale=0.5]{dis2D-20.png}
+\caption{2-D(20 species)}
+\label{fig:chart}
+\end{figure}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=80mm,scale=0.5]{dis3D-20.png}
+\caption{3-D(20 species)}
+\label{fig:chart}
+\end{figure}
+
+Starting with the first three plots, they're all from the same data set but each uses more dimensions than the last. Clearly, adding more dimensions makes our model match the data better. But even with three dimensions, the fit isn't perfect. This tells us that simplifying our complex data into a few dimensions might be quite challenging.\\
+
+Next, let's look at how our model performs as we exclude certain species from our data. It seems that when we remove the most distinct or "extreme" species, our model starts to fit the data better. This is true even when we compare models with the same number of dimensions. And this trend holds up even more when we look at the 3-D plots. This gives us a hint that the dimensions of our model might be related to how different the species are from each other. I'm expecting that our upcoming comparison of different models will shed more light on this idea:\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=100mm,scale=0.5]{dis2D-17.png}
+\caption{2-D(17 species)}
+\label{fig:chart}
+\end{figure}\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=100mm,scale=0.5]{dis2D-13.png}
+\caption{2-D(13 species)}
+\label{fig:chart}
+\end{figure}\\
+
+Finally, when we look at the 3-D model with the final 13 species, it does a pretty good job of fitting the data. Sure, there are some data points that stray from the line where y equals x, but overall, the model seems to capture the general trend quite well. This suggests that our strategy of dealing with outlying species and focusing on different animal groups could give us a better understanding of the genetic distances between these groups.\\
+\begin{figure}[h!]
+\centering
+\includegraphics[width=100mm,scale=0.5]{dis3D-13.png}
+\caption{3-D(13 species)}
+\label{fig:chart}
+\end{figure}\\
+
+To examine the meaning of different dimensions, I notice that as the dimension of the model increases, we can see from the Goodness of Fit (GOF) gets better and better, yet some extreme errors always occur:
+$$\textit{1-D model (20 species) GOF: } [0.5266, 0.5356]$$
+$$\textit{2-D model (20 species) GOF: } [0.6840, 0.6958]$$
+$$\textit{3-D model (20 species) GOF: } [0.7947, 0.8084]$$\\
+
+As the model's dimensionality increases, the overall error of the model decreases:
+$$\textit{1-D model (20 species) MAD: } 13.79$$
+$$\textit{2-D model (20 species) MAD: } 9.62$$
+$$\textit{3-D model (20 species) MAD: } 5.53$$\\
+
+This fact implies that species with significant differences in mutation distances will be fitted by the model (since they influence the overall trend more compared to those with smaller mutation distances), which leads to significant errors for species with smaller mutation distances.\\
+
+Next, I notice that as the number of species decreases, the model fits the data better:
+$$\textit{2-D model (20 species) GOF: } [0.6840, 0.6958]$$
+$$\textit{2-D model (17 species) GOF: } [0.6002, 0.6202]$$
+$$\textit{2-D model (13 species) GOF: } [0.7750, 0.8049]$$\\
+
+In actuality, the crucial aspect here is not the number of species but the categories of species. Recall that the last three species are fungi, which are very different from other animals in terms of mutation distances. Also, the four species I discarded later are cold-blooded animals and insects, which are relatively distinct from mammals and birds. This indeed indicates that the dimensions of the model for this dataset represent categories of species.\\
+
+Besides, as the number of positive eigenvalues decreases, it implies that the number of dimensions needed for the model to have the same GOF is decreasing. This means that when I discard species, I'm actually discarding the dimensions of the model:\\
+$$\textit{(20 species): } 14 \textit{ positive eigenvalues}$$
+$$\textit{(17 species): } 12 \textit{ positive eigenvalues}$$
+$$\textit{(13 species): } 9 \textit{ positive eigenvalues}$$\\
+
+For these reasons, I think that the x-dimension in my 2-D model represents the categories for birds and mammals, and the y-dimension is hard to distinguish, thus I would like to guess y-dimension represents mammals other than primates(for the three weird primates in the top of the graph...!). To achieve a perfect 2-D model for this data, I would need to discard all species except for humans, monkeys, and other mammals. Since in a 2-D model, there are only two dimensions, only data with two or fewer categories of species can be perfectly modeled. Humans and monkeys are primates, which is our category 1, so any other mammals that are not primates will be considered category 2.\\\\
+\textbf{Appendix}\\
+John Hartigan, Clustering Algorithms, Wiley, 1975. ISBN 0-471-35645-X LC: QA278.H36 Dewey: 519.5'3\\
+\end{document}
+
